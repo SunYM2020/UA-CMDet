@@ -358,11 +358,11 @@ class TSCustomDataset(Dataset):
 
         img_r = mmcv.imread(osp.join(self.img_prefix_r, img_info_r['filename']))
         img_i = mmcv.imread(osp.join(self.img_prefix_i, img_info_i['filename']))
-
-        # use for cal the dark weight
         crop_region = np.array([100, 100, 739, 611])
-        crop_img_r = mmcv.imcrop(img_r, crop_region)
-        w_dark = self.img_to_GRAY(crop_img_r)
+        img_r = mmcv.imcrop(img_r, crop_region)
+        img_i = mmcv.imcrop(img_i, crop_region)
+
+        w_dark = self.img_to_GRAY(img_r)
 
         if self.proposals is not None:
             proposal = self.proposals[idx][:self.num_max_proposals]

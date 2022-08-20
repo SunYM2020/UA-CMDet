@@ -300,6 +300,9 @@ class CustomDataset(Dataset):
         """Prepare an image for testing (multi-scale and flipping)"""
         img_info = self.img_infos[idx]
         img = mmcv.imread(osp.join(self.img_prefix, img_info['filename']))
+        crop_region = np.array([100, 100, 739, 611])
+        img = mmcv.imcrop(img, crop_region)
+
         if self.proposals is not None:
             proposal = self.proposals[idx][:self.num_max_proposals]
             if not (proposal.shape[1] == 4 or proposal.shape[1] == 5):
