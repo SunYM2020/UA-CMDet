@@ -5,7 +5,7 @@ This is the official repository for “Drone-based RGB-Infrared Cross-Modality V
 
 Please cite this paper if you want to use it in your work.
 
-"""
+```
 @ARTICLE{sun2020drone,
   title={Drone-based RGB-Infrared Cross-Modality Vehicle Detection via Uncertainty-Aware Learning}, 
   author={Sun, Yiming and Cao, Bing and Zhu, Pengfei and Hu, Qinghua},
@@ -16,4 +16,4 @@ Please cite this paper if you want to use it in your work.
   pages={1-1},
   doi={10.1109/TCSVT.2022.3168279}
 }
-"""
+```
