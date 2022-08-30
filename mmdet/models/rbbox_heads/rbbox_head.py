@@ -363,48 +363,89 @@ class BBoxHeadRbbox(nn.Module):
             # det_labels = torch.from_numpy(det_labels).to(c_device)
             return det_bboxes, det_labels
 
-    def get_det_rbboxes_soft(self,
-                       rrois,
-                       cls_score,
-                       rbbox_pred,
-                       img_shape,
-                       scale_factor,
-                       light_weight,
-                       rescale=False,
-                       cfg=None):
-        if isinstance(cls_score, list):
-            cls_score = sum(cls_score) / float(len(cls_score))
-        scores = F.softmax(cls_score, dim=1) if cls_score is not None else None
-        scores = scores * light_weight    # weight the rgb softmax score     light_weight<=0.55 or light_weight=1
+    def get_fusion_det_rbboxes(self,
+                              rrois_r,
+                              cls_score_r,
+                              rbbox_pred_r,
+                              img_shape_r,
+                              scale_factor_r,
+                              rrois_i,
+                              cls_score_i,
+                              rbbox_pred_i,
+                              img_shape_i,
+                              scale_factor_i,
+                              rrois_f,
+                              cls_score_f,
+                              rbbox_pred_f,
+                              light_weight,
+                              rescale=False,
+                              cfg=None):
+        # RGB
+        if isinstance(cls_score_r, list):
+            cls_score_r = sum(cls_score_r) / float(len(cls_score_r))
+        scores_r = F.softmax(cls_score_r, dim=1) if cls_score_r is not None else None
+        scores_r = scores_r * light_weight    # weight the rgb softmax score
+        # Infrared
+        if isinstance(cls_score_i, list):
+            cls_score_i = sum(cls_score_i) / float(len(cls_score_i))
+        scores_i = F.softmax(cls_score_i, dim=1) if cls_score_i is not None else None
+        # fusion
+        if isinstance(cls_score_f, list):
+            cls_score_f = sum(cls_score_f) / float(len(cls_score_f))
+        scores_f = F.softmax(cls_score_f, dim=1) if cls_score_f is not None else None
 
-        if rbbox_pred is not None:
-            # bboxes = delta2dbbox(rois[:, 1:], bbox_pred, self.target_means,
-            #                     self.target_stds, img_shape)
-            dbboxes = delta2dbbox_v2(rrois[:, 1:], rbbox_pred, self.target_means,
-                                     self.target_stds, img_shape)
+        # RGB
+        if rbbox_pred_r is not None:
+            dbboxes_r = delta2dbbox_v2(rrois_r[:, 1:], rbbox_pred_r, self.target_means,
+                                     self.target_stds, img_shape_r)
         else:
-            # bboxes = rois[:, 1:]
-            dbboxes = rrois[:, 1:]
-            # TODO: add clip here
+            dbboxes_r = rrois_r[:, 1:]
 
         if rescale:
-            # bboxes /= scale_factor
-            # dbboxes[:, :4] /= scale_factor
-            dbboxes[:, 0::5] /= scale_factor
-            dbboxes[:, 1::5] /= scale_factor
-            dbboxes[:, 2::5] /= scale_factor
-            dbboxes[:, 3::5] /= scale_factor
-        if cfg is None:
-            return dbboxes, scores
-        else:
-            c_device = dbboxes.device
+            dbboxes_r[:, 0::5] /= scale_factor_r
+            dbboxes_r[:, 1::5] /= scale_factor_r
+            dbboxes_r[:, 2::5] /= scale_factor_r
+            dbboxes_r[:, 3::5] /= scale_factor_r
 
-            det_bboxes, det_labels = multiclass_nms_rbbox(dbboxes, scores,
+        # Infrared
+        if rbbox_pred_i is not None:
+            dbboxes_i = delta2dbbox_v2(rrois_i[:, 1:], rbbox_pred_i, self.target_means,
+                                     self.target_stds, img_shape_i)
+        else:
+            dbboxes_i = rrois_i[:, 1:]
+
+        if rescale:
+            dbboxes_i[:, 0::5] /= scale_factor_i
+            dbboxes_i[:, 1::5] /= scale_factor_i
+            dbboxes_i[:, 2::5] /= scale_factor_i
+            dbboxes_i[:, 3::5] /= scale_factor_i
+
+        # fusion
+        if rbbox_pred_f is not None:
+            dbboxes_f = delta2dbbox_v2(rrois_f[:, 1:], rbbox_pred_f, self.target_means,
+                                     self.target_stds, img_shape_i)
+        else:
+            dbboxes_f = rrois_f[:, 1:]
+
+        if rescale:
+            dbboxes_f[:, 0::5] /= scale_factor_i
+            dbboxes_f[:, 1::5] /= scale_factor_i
+            dbboxes_f[:, 2::5] /= scale_factor_i
+            dbboxes_f[:, 3::5] /= scale_factor_i
+
+        fusion_dbboxes = torch.cat((dbboxes_r, dbboxes_i, dbboxes_f), dim=0)
+        fusion_scores = torch.cat((scores_r, scores_i, scores_f), dim=0)
+
+        if cfg is None:
+            return fusion_dbboxes, fusion_scores
+        else:
+            c_device = fusion_dbboxes.device
+
+            det_bboxes, det_labels = multiclass_nms_rbbox(fusion_dbboxes, fusion_scores,
                                                     cfg.score_thr, cfg.nms,
                                                     cfg.max_per_img)
-            # det_bboxes = torch.from_numpy(det_bboxes).to(c_device)
-            # det_labels = torch.from_numpy(det_labels).to(c_device)
             return det_bboxes, det_labels
+
 
     def refine_rbboxes(self, rois, labels, bbox_preds, pos_is_gts, img_metas):
         """Refine bboxes during training.
