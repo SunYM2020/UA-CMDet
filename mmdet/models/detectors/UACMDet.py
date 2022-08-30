@@ -733,42 +733,25 @@ class LightThreeStreamUncertainty(BaseDetectorNew, RPNTestMixin):
         rcls_score_i, rbbox_pred_i = self.rbbox_head_i(rbbox_feats_i)
         rcls_score_f, rbbox_pred_f = self.rbbox_head_f(rbbox_feats_f)
 
-        # rgb
-        det_rbboxes_r, det_labels_r = self.rbbox_head_r.get_det_rbboxes(
+        det_rbboxes_fusion, det_labels_fusion = self.rbbox_head_f.get_fusion_det_rbboxes(
             rrois_r,
             rcls_score_r,
             rbbox_pred_r,
             img_shape_r,
             scale_factor_r,
-            rescale=rescale,
-            cfg=rcnn_test_cfg)
-
-        # infrared
-        det_rbboxes_i, det_labels_i = self.rbbox_head_i.get_det_rbboxes(
             rrois_i,
             rcls_score_i,
             rbbox_pred_i,
             img_shape_i,
             scale_factor_i,
-            rescale=rescale,
-            cfg=rcnn_test_cfg)
-
-        # fusion
-        det_rbboxes_f, det_labels_f = self.rbbox_head_f.get_det_rbboxes(
             rrois_f,
             rcls_score_f,
             rbbox_pred_f,
-            img_shape_i,
-            scale_factor_i,
+            rgb_dark,
             rescale=rescale,
             cfg=rcnn_test_cfg)
 
-        # use f 
-        rbbox_results_f = dbbox2result(det_rbboxes_f, det_labels_f,
-                                     self.rbbox_head_r.num_classes)
-        rbbox_results_r = dbbox2result(det_rbboxes_r, det_labels_r,
-                                     self.rbbox_head_r.num_classes)
-        rbbox_results_i = dbbox2result(det_rbboxes_i, det_labels_i,
-                                     self.rbbox_head_i.num_classes)
+        rbbox_results_fusion = dbbox2result(det_rbboxes_fusion, det_labels_fusion,
+                                     self.rbbox_head_f.num_classes)
 
-        return rbbox_results_f, rbbox_results_i   # rbbox_results_r
+        return rbbox_results_fusion
