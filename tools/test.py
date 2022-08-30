@@ -37,38 +37,12 @@ def single_gpu_test(model, data_loader, show=False, log_dir=None):
         if show:
             model.module.show_result(data, result, dataset.img_norm_cfg)
 
-        batch_size = data['img'][0].size(0)
+        batch_size = data['img'][0].size(0)        # img_i
         for _ in range(batch_size):
             prog_bar.update()
 
     return results
 
-def single_gpu_test_TS(model, data_loader, show=False, log_dir=None):
-    model.eval()
-    results_r = []
-    results_i = []
-    dataset = data_loader.dataset
-    if log_dir != None:
-        filename = 'inference{}.log'.format(get_time_str())
-        log_file = osp.join(log_dir, filename)
-        f = open(log_file, 'w')
-        prog_bar = mmcv.ProgressBar(len(dataset), file=f)
-    else:
-        prog_bar = mmcv.ProgressBar(len(dataset))
-    for i, data in enumerate(data_loader):
-        with torch.no_grad():
-            result_r, result_i = model(return_loss=False, rescale=not show, **data)
-        results_r.append(result_r)
-        results_i.append(result_i)
-
-        if show:
-            model.module.show_result(data, result, dataset.img_norm_cfg)
-
-        batch_size = data['img_r'][0].size(0)
-        for _ in range(batch_size):
-            prog_bar.update()
-
-    return results_r, results_i
 
 def multi_gpu_test(model, data_loader, tmpdir=None):
     model.eval()
@@ -139,8 +113,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='MMDet test detector')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
-    parser.add_argument('--out_r', help='output rgb result file')
-    parser.add_argument('--out_i', help='output infrared result file')
+    parser.add_argument('--out', help='output result file')
     parser.add_argument(
         '--eval',
         type=str,
@@ -163,10 +136,8 @@ def parse_args():
 def main():
     args = parse_args()
 
-    if args.out_r is not None and not args.out_r.endswith(('.pkl', '.pickle')):
-        raise ValueError('The output rgb file must be a pkl file.')
-    if args.out_i is not None and not args.out_i.endswith(('.pkl', '.pickle')):
-        raise ValueError('The output infrared file must be a pkl file.')
+    if args.out is not None and not args.out.endswith(('.pkl', '.pickle')):
+        raise ValueError('The output file must be a pkl file.')
 
     cfg = mmcv.Config.fromfile(args.config)
     # set cudnn_benchmark
@@ -175,12 +146,15 @@ def main():
     cfg.model.pretrained = None
     cfg.data.test.test_mode = True
 
+    # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
         distributed = False
     else:
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
+    # build the dataloader
+    # TODO: support multiple images per gpu (only minor changes are needed)
     dataset = get_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
@@ -201,19 +175,15 @@ def main():
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs_r, outputs_i = single_gpu_test_TS(model, data_loader, args.show, args.log_dir)
+        outputs = single_gpu_test(model, data_loader, args.show, args.log_dir)
     else:
         model = MMDistributedDataParallel(model.cuda())
         outputs = multi_gpu_test(model, data_loader, args.tmpdir)
 
     rank, _ = get_dist_info()
-
-    if args.out_r and args.out_i and rank == 0:
-        print('\nwriting results to {}'.format(args.out_r))
-        print('\nwriting results to {}'.format(args.out_i))
-        mmcv.dump(outputs_r, args.out_r)
-        mmcv.dump(outputs_i, args.out_i)
-
+    if args.out and rank == 0:
+        print('\nwriting results to {}'.format(args.out))
+        mmcv.dump(outputs, args.out)
         eval_types = args.eval
         if eval_types:
             print('Starting evaluate {}'.format(' and '.join(eval_types)))
@@ -232,6 +202,7 @@ def main():
                         result_file = args.out + '.{}.json'.format(name)
                         results2json(dataset, outputs_, result_file)
                         coco_eval(result_file, eval_types, dataset.coco)
+
 
 if __name__ == '__main__':
     main()
