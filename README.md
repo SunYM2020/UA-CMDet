@@ -8,6 +8,16 @@ Drone-based vehicle detection aims at detecting vehicle locations and categories
 
 ![framework](./framework.png)
 
+## Requirements
+- Ubuntu 18.04
+- CUDA 10.0
+- NCCL 2+
+- GCC 4.9+
+- PyTorch 1.1
+- Python 3.7
+- torchvision 0.3
+- mmcv 0.4.3
+
 ## DroneVehicle Dataset
 
 [DroneVehicle](https://github.com/VisDrone/DroneVehicle) dataset is available now.  
