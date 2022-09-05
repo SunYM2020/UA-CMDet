@@ -23,12 +23,10 @@ import json
 from mmcv import Config
 import sys
 
-from DOTA_devkit.ResultMerge_multi_process import *
-
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config', default='configs/DOTA/faster_rcnn_r101_fpn_1x_dota2_v3_RoITrans_v5.py')
-    parser.add_argument('--type', default=r'HBB',
+    parser.add_argument('--config', default='configs/DroneVehicle/UACMDet.py')
+    parser.add_argument('--type', default=r'OBB',
                         help='parse type of detector')
     args = parser.parse_args()
 
@@ -104,52 +102,12 @@ def parse_results(config_file, resultfile, dstpath, type):
                     else:
                         f_out.write(outline)
 
-def parse_results_TS(config_file, resultfile_r, resultfile_i, dstpath, type):
-    cfg = Config.fromfile(config_file)
-
-    data_test = cfg.data['test']
-    dataset = get_dataset(data_test)
-    outputs_r = mmcv.load(resultfile_r)
-    outputs_i = mmcv.load(resultfile_i)
-
-    if type == 'OBB':
-        obb_results_dict_r = OBBDetComp4_rgb(dataset, outputs_r)
-        obb_results_dict_i = OBBDetComp4_infrared(dataset, outputs_i)
-        current_thresh = 0.1
-
-    dataset_type = cfg.dataset_type
-
-    if 'obb_results_dict_r' in vars():
-        if not os.path.exists(os.path.join(dstpath, 'Task1_results_r')):
-            os.makedirs(os.path.join(dstpath, 'Task1_results_r'))
-
-        for cls in obb_results_dict_r:
-            with open(os.path.join(dstpath, 'Task1_results_r', cls + '.txt'), 'w') as obb_f_out_r:
-                for index, outline in enumerate(obb_results_dict_r[cls]):
-                    if index != (len(obb_results_dict_r[cls]) - 1):
-                        obb_f_out_r.write(outline + '\n')
-                    else:
-                        obb_f_out_r.write(outline)
-
-    if 'obb_results_dict_i' in vars():
-        if not os.path.exists(os.path.join(dstpath, 'Task1_results_i')):
-            os.makedirs(os.path.join(dstpath, 'Task1_results_i'))
-
-        for cls in obb_results_dict_i:
-            with open(os.path.join(dstpath, 'Task1_results_i', cls + '.txt'), 'w') as obb_f_out_i:
-                for index, outline in enumerate(obb_results_dict_i[cls]):
-                    if index != (len(obb_results_dict_i[cls]) - 1):
-                        obb_f_out_i.write(outline + '\n')
-                    else:
-                        obb_f_out_i.write(outline)
-
 if __name__ == '__main__':
     args = parse_args()
     config_file = args.config
     config_name = os.path.splitext(os.path.basename(config_file))[0]
-    pkl_file_r = os.path.join('work_dirs', config_name, 'results_r.pkl')
-    pkl_file_i = os.path.join('work_dirs', config_name, 'results_i.pkl')
+    pkl_file = os.path.join('work_dirs', config_name, 'results.pkl')
     output_path = os.path.join('work_dirs', config_name)
     type = args.type
-    parse_results_TS(config_file, pkl_file_r, pkl_file_i, output_path, type)
+    parse_results(config_file, pkl_file, output_path, type)
 
