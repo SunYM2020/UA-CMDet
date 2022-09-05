@@ -110,4 +110,3 @@ if __name__ == '__main__':
     output_path = os.path.join('work_dirs', config_name)
     type = args.type
     parse_results(config_file, pkl_file, output_path, type)
-
