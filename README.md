@@ -18,6 +18,10 @@ Drone-based vehicle detection aims at detecting vehicle locations and categories
 - torchvision 0.3
 - mmcv 0.4.3
 
+## Installation
+
+Please refer to [INSTALL.md](INSTALL.md) for installation.
+
 ## DroneVehicle Dataset
 
 [DroneVehicle](https://github.com/VisDrone/DroneVehicle) dataset is available now.  
