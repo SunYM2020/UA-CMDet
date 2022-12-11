@@ -3,12 +3,12 @@ import numpy as np
 
 class DroneVehicleDataset(CocoDataset):
 
-    CLASSES = ('car', 'feright_car', 'truck', 'bus', 'van')
+    CLASSES = ('car', 'freight_car', 'truck', 'bus', 'van')
 
 
 class DroneVehicleDataset_v3(CocoDataset):
 
-    CLASSES = ('car', 'feright_car', 'truck', 'bus', 'van')
+    CLASSES = ('car', 'freight_car', 'truck', 'bus', 'van')
 
     def _parse_ann_info(self, ann_info, with_mask=True):
         """Parse bbox and mask annotation.

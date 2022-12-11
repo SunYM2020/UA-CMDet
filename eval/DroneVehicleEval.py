@@ -18,7 +18,7 @@ from functools import partial
 import pdb
 
 def object_classes():
-    return ['car', 'feright_car', 'truck', 'bus', 'van']
+    return ['car', 'freight_car', 'truck', 'bus', 'van']
 
 def get_segmentation(points):
     return [points[0], points[1], points[2] + points[0], points[1],
@@ -40,7 +40,7 @@ def parse_gt(xml_path):
         if name == '*':
             continue
         if name == 'feright car' or name == 'feright':
-            object_struct['name'] = 'feright_car'
+            object_struct['name'] = 'freight_car'
         elif name == 'truvk':
             object_struct['name'] = 'truck'
         else:
@@ -268,7 +268,7 @@ def main():
     print(label_ids)
 
     # For DroneVehicle
-    classnames = ['car', 'feright_car', 'truck', 'bus', 'van']
+    classnames = ['car', 'freight_car', 'truck', 'bus', 'van']
     classaps = []
     map = 0
     for classname in classnames:

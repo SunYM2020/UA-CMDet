@@ -3,12 +3,12 @@ import numpy as np
 
 class TSDroneVehicleDataset(TSCocoDataset):
 
-    CLASSES = ('car', 'feright_car', 'truck', 'bus', 'van')
+    CLASSES = ('car', 'freight_car', 'truck', 'bus', 'van')
 
 
 class TSDroneVehicleDataset_v3(TSCocoDataset):
 
-    CLASSES = ('car', 'feright_car', 'truck', 'bus', 'van')
+    CLASSES = ('car', 'freight_car', 'truck', 'bus', 'van')
 
     def _parse_ann_info(self, ann_info, with_mask=True):
         """Parse bbox and mask annotation.
