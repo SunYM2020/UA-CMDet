@@ -22,9 +22,33 @@ Drone-based vehicle detection aims at detecting vehicle locations and categories
 
 Please refer to [INSTALL.md](INSTALL.md) for installation.
 
+## Getting Started
+
+### Train with a single GPU. 
+```shell
+python tools/train.py configs/DroneVehicle/UACMDet.py
+```
+
+### Inference
+
+```shell
+python tools/test.py configs/DroneVehicle/UACMDet.py work_dirs/UACMDet/${CHECKPOINT_FILE} --out work_dirs/UACMDet/results.pkl
+```
+
+### Parse the results.pkl
+```
+python tools/parse_results.py --config configs/DroneVehicle/UACMDet.py --type OBB
+```
+
+### Evaluation
+```
+python eval/DroneVehicleEval.py
+```
+
 ## DroneVehicle Dataset
 
-[DroneVehicle](https://github.com/VisDrone/DroneVehicle) dataset is available now.  
+> 1. [DroneVehicle](https://github.com/VisDrone/DroneVehicle) dataset is available now.  
+> 2. Annotation files in COCO format can be downloaded in the [link](https://pan.baidu.com/s/1k0WdfqDgwloQn4xfKfmNFA?pwd=x742). (extracting code: **x742**)
 
 ## Citation
 
