@@ -48,7 +48,7 @@ python eval/DroneVehicleEval.py
 ## DroneVehicle Dataset
 
 > 1. [DroneVehicle](https://github.com/VisDrone/DroneVehicle) dataset is available now.  
-> 2. Annotation files in COCO format can be downloaded in the [link](https://pan.baidu.com/s/1k0WdfqDgwloQn4xfKfmNFA?pwd=x742). (extracting code: **x742**)
+> 2. Annotation files in COCO format can be downloaded in the [link](https://pan.baidu.com/s/1J_uiqczFmlW0tfdllu4iZw?pwd=vdbt). (extracting code: **vdbt**)
 
 ## Citation
 
