@@ -263,8 +263,8 @@ def main():
     # annopath = r'/root/UA-CMDet/data/DroneVehicle/val/vallabelr/{:s}.xml'    # for eval val set
     annopath = r'/root/UA-CMDet/data/DroneVehicle/test/testlabelr/{:s}.xml'     # for eval test set
 
-    # imagesetfile = r'root/UA-CMDet/filename_val.txt'
-    imagesetfile = r'root/UA-CMDet/filename_test.txt'       # Please refer to the form of filename_val.txt to generate it.
+    # imagesetfile = r'root/UA-CMDet/filename_val.txt'      # for eval val set
+    imagesetfile = r'root/UA-CMDet/filename_test.txt'       # for eval test set
 
     label_ids = {name: i + 1 for i, name in enumerate(object_classes())}
     print(label_ids)
