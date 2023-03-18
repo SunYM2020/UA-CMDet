@@ -60,9 +60,9 @@ Please cite this paper if you want to use it in your work.
   author={Sun, Yiming and Cao, Bing and Zhu, Pengfei and Hu, Qinghua},
   journal={IEEE Transactions on Circuits and Systems for Video Technology}, 
   year={2022},
-  volume={},
-  number={},
-  pages={1-1},
+  volume={32},
+  number={10},
+  pages={6700-6713},
   doi={10.1109/TCSVT.2022.3168279}
 }
 ```
