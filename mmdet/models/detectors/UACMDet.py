@@ -341,7 +341,7 @@ class LightThreeStreamUncertainty(BaseDetectorNew, RPNTestMixin):
                 infrared_index = inds[1][index]
                 if max(overlaps[rgb_index]) < 0.8:
                     obb_uncertain_r = overlaps[rgb_index][infrared_index]
-                    obb_uncertains_r[rgb_index] = obb_uncertain_r
+                    obb_uncertains_r[rgb_index] = obb_uncertain_r * obb_uncertains_r[rgb_index]
 
             obb_u_r.append(obb_uncertains_r)
 
