@@ -76,7 +76,8 @@ def OBBDet2Comp4(dataset, results):
 def OBBDetComp4(dataset, results):
     results_dict = {}
     for idx in range(len(dataset)):
-        filename = dataset.img_infos[idx]['filename']
+        # filename = dataset.img_infos[idx]['filename']
+        filename = dataset.img_infos_i[idx]['filename']
         result = results[idx]
         for label in range(len(result)):
             rbboxes = result[label]
