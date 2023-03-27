@@ -1,7 +1,7 @@
 from __future__ import division
 
 import argparse
-import os.path as osp
+import os
 import shutil
 import tempfile
 
