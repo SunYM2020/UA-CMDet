@@ -39,7 +39,7 @@ def parse_gt(xml_path):
         name = obj.find('name').text
         if name == '*':
             continue
-        if name == 'feright car' or name == 'feright':
+        if name in ['feright car', 'feright_car', 'feright', 'freight car', 'freight_car']:
             object_struct['name'] = 'freight_car'
         elif name == 'truvk':
             object_struct['name'] = 'truck'
