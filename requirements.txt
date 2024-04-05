@@ -1,4 +1,4 @@
-Cython
-mmcv
+# Cython
+# mmcv
 shapely
 tqdm

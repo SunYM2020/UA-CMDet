@@ -1,0 +1,10 @@
+eval/_polyiou.cpython-37m-x86_64-linux-gnu.so
+DOTA_devkit/_polyiou.cpython-37m-x86_64-linux-gnu.so
+/.eggs/
+work_dirs/
+mmdet/__pycache__/
+__pycache__/
+build/
+__pycache__/*
+*.so
+# *.pyc
